@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,11 +26,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -45,8 +49,19 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
+import com.example.composeapp.models.BottomNavigationBarItem
+import com.example.composeapp.ui.components.BottomNavigationBarItem
+import com.example.composeapp.ui.screens.CalendarScreen
+import com.example.composeapp.ui.screens.HomeScreen
+import com.example.composeapp.ui.screens.LayoutScreen
+import com.example.composeapp.ui.screens.ListScreen
+import com.example.composeapp.ui.screens.SettingsScreen
 import com.example.composeapp.ui.theme.ComposeAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -54,13 +69,44 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeAppTheme {
+                val navController = rememberNavController()
+
                 // A surface container using the 'background' color from the theme
-                Surface(
+                Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        CardWithImage()
+                    bottomBar = {
+                        BottomNavigationBarItem(navController = navController)
+                    }
+                ) { innerPadding ->
+                    NavHost(navController = navController, startDestination = "home") {
+                        composable(route = "home") {
+                            HomeScreen(navController)
+                        }
+                        composable(
+                            route = "settings/{value}",
+                            arguments = listOf(
+                                navArgument("value") {
+                                    type = NavType.IntType
+                                    defaultValue = 0
+                                    nullable = false
+                                }
+                            )
+                        ) { propiedades ->
+                            val value = propiedades.arguments?.getInt("value") ?: 0
+                            SettingsScreen(value)
+                        }
+                        composable(route = "calendar") {
+                            CalendarScreen()
+                        }
+                        composable(route= "settings") {
+                            SettingsScreen(value = 0)
+                        }
+                        composable(route = "list") {
+                            ListScreen()
+                        }
+                        composable(route = "layout") {
+                            LayoutScreen()
+                        }
                     }
                 }
             }
@@ -86,11 +132,13 @@ fun MyColumn() {
 
 @Composable
 fun MyRow() {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .horizontalScroll(
-            rememberScrollState()
-        )) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(
+                rememberScrollState()
+            )
+    ) {
 //        Text("Ejemplo 1", modifier = Modifier
 //            .background(Color.Red)
 //            .weight(1f))
@@ -151,7 +199,7 @@ fun MyBox() {
 @Composable
 fun MyList() {
     val productList = listOf("Hamburguesa", "Pizza", "Tacos", "Sushi", "Ensalada")
-    LazyColumn(modifier = Modifier.fillMaxSize()){
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(productList) { product ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -168,45 +216,59 @@ fun MyList() {
 }
 
 @Composable
-fun MyComplexLayout(){
+fun MyComplexLayout() {
     Column(modifier = Modifier.fillMaxSize()) {
-        Box(modifier= Modifier
-            .fillMaxWidth()
-            .weight(1f)
-            .background(Color.Cyan)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .background(Color.Cyan)
+        ) {
 
         }
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f)) {
-            Box(modifier = Modifier
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
                 .weight(1f)
-                .fillMaxHeight()
-                .background(Color.Yellow), contentAlignment = Alignment.BottomEnd) {
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .background(Color.Yellow), contentAlignment = Alignment.BottomEnd
+            ) {
                 Text("Hola a todos")
             }
-            Box(modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .background(Color.Green), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .background(Color.Green), contentAlignment = Alignment.Center
+            ) {
                 Text("Hola a todos")
             }
         }
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f)
-            .background(Color.Magenta)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .background(Color.Magenta)
+        ) {
 
         }
     }
 
 }
+
 @Composable
 fun MyAdvancedComplexLayoutWithoutCards() {
-    val foodList = listOf("Hamburguesa","Pizza","Tacos","Sushi","Ensalada", "Hot Dogs", "Lasagna")
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
+    val foodList =
+        listOf("Hamburguesa", "Pizza", "Tacos", "Sushi", "Ensalada", "Hot Dogs", "Lasagna")
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
         // Encabezado
         Box(
             modifier = Modifier
@@ -220,9 +282,11 @@ fun MyAdvancedComplexLayoutWithoutCards() {
 
 
         // Filas con diferentes elementos
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
             // Caja 1
             Box(
                 modifier = Modifier
@@ -312,14 +376,18 @@ fun MyAdvancedComplexLayoutWithoutCards() {
 }
 
 @Composable
-fun MyStateExample(){
+fun MyStateExample() {
     // var counter = 0
-     val counter = remember { mutableStateOf(0) }
+    val counter = remember { mutableStateOf(0) }
     // val coutner = rememberSaveable { mutableStateOf(0) }
     //var counter by remember { mutableIntStateOf(0) }
-    Column(Modifier.fillMaxSize(),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text("El valor del contador es: ${counter.value}")
-        Button(onClick = { counter.value ++ }) {
+        Button(onClick = { counter.value++ }) {
             Text("Incrementar")
         }
     }
