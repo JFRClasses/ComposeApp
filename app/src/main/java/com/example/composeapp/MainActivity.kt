@@ -3,6 +3,7 @@ package com.example.composeapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -10,19 +11,25 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -30,10 +37,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.composeapp.ui.theme.ComposeAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -46,7 +59,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MyColumn()
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        CardWithImage()
+                    }
                 }
             }
         }
@@ -186,7 +201,115 @@ fun MyComplexLayout(){
     }
 
 }
+@Composable
+fun MyAdvancedComplexLayoutWithoutCards() {
+    val foodList = listOf("Hamburguesa","Pizza","Tacos","Sushi","Ensalada", "Hot Dogs", "Lasagna")
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
+        // Encabezado
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .background(Color.Cyan),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("Encabezado", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        }
 
+
+        // Filas con diferentes elementos
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)) {
+            // Caja 1
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .background(Color.Yellow),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Caja 1", fontSize = 18.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = { /* Acción del botón */ }) {
+                        Text("Acción")
+                    }
+                }
+            }
+
+            // Caja 2
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .background(Color.Green),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Caja 2", fontSize = 18.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = { /* Acción del botón */ }) {
+                        Text("Acción")
+                    }
+                }
+            }
+        }
+
+        // Lista de elementos
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .background(Color.LightGray)
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            Text("Lista de Elementos", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            LazyColumn {
+                items(foodList) { index ->
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(Color.LightGray)
+                            .fillMaxWidth()
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(20.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = index,
+                            )
+                            Text(
+                                index,
+                                modifier = Modifier.padding(start = 10.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+        }
+
+        // Pie de página
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .background(Color.Magenta),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("Pie de página", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
 
 @Composable
 fun MyStateExample(){
@@ -202,6 +325,35 @@ fun MyStateExample(){
     }
 }
 
+@Composable
+fun CardWithImage() {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Image(
+                painter = rememberAsyncImagePainter(model = "https://static.wikia.nocookie.net/doblaje/images/a/ad/Marvel_Super_Hero_Adventures.png/revision/latest?cb=20240215235222&path-prefix=es"),
+                contentDescription = "Loaded from internet",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Image Loaded from Internet",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+    }
+}
+
 @Preview(
     name = "Preview 1 Guay",
     showBackground = true,
@@ -211,6 +363,6 @@ fun MyStateExample(){
 @Composable
 fun GreetingPreview() {
     ComposeAppTheme {
-        MyStateExample()
+        CardWithImage()
     }
 }
